@@ -13,7 +13,7 @@ import CoreData
 class ViewController: UIViewController,UITableViewDataSource {
     
     var people = [NSManagedObject]()
-    var thumbnails = ["neymar","messi"]
+    var thumbnails = ["neymar","messi","falcao","cavanni","ribery","rooney", "iniesta","pirlo","ronaldo"]
 
     
     @IBOutlet weak var tableView: UITableView!
@@ -42,13 +42,13 @@ class ViewController: UIViewController,UITableViewDataSource {
             //cell detail fix
             //http://stackoverflow.com/questions/34101102/uitableviewcell-detailtextlabel-not-showing-up
             
-            var cell = tableView.dequeueReusableCellWithIdentifier("CellId")
+            var cell = tableView.dequeueReusableCellWithIdentifier("CellId") as UITableViewCell!
+            
             if cell == nil {
                 cell = UITableViewCell(style: .Value1, reuseIdentifier: "CellId")
             }
             
-            
-            let person = people[indexPath.row]
+            let person = self.people[indexPath.row]
             
             //assigning the value from the first textfield to the name attribute
             cell!.textLabel!.text = person.valueForKey("name") as? String
@@ -70,7 +70,36 @@ class ViewController: UIViewController,UITableViewDataSource {
             
             return cell!
     }
-
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        //setting the cell
+        var cell = tableView.dequeueReusableCellWithIdentifier("CellId")
+        if cell == nil {
+            cell = UITableViewCell(style: .Value1, reuseIdentifier: "CellId")
+        }
+        
+        //now the managedObject
+        let person = self.people[indexPath.row]
+        
+        cell!.textLabel!.text = person.valueForKey("name") as? String
+        
+        //assigning the value of the second textfield to the skill attribute
+        cell!.detailTextLabel?.text = person.valueForKey("skill") as? String
+        
+        //assigning the image form coredata
+        let imageName = person.valueForKey("picture") as? String
+        let image = UIImage(named:imageName!)
+        cell?.imageView!.image = image
+        
+        //checking condition
+        
+        if  (person.valueForKey("selected") as? Bool == true){
+            cell!.backgroundColor = UIColor.brownColor()
+            NSLog("i am selected")
+        }
+        
+    }
     
     @IBAction func addPlayerinformation(sender: AnyObject) {
         
@@ -150,11 +179,18 @@ class ViewController: UIViewController,UITableViewDataSource {
         person.setValue(skill, forKey: "skill")
         person.setValue(picture, forKey: "picture")
         
+        //setting the selected attribute to false
+        //person.setValue(false, forKey: "selected")
+
+        
         //4
         do {
             try managedContext.save()
             //5
             people.append(person)
+            
+            //debuging
+            NSLog("\(people.count)")
         } catch let error as NSError  {
             print("Could not save \(error), \(error.userInfo)")
         }
@@ -181,7 +217,7 @@ class ViewController: UIViewController,UITableViewDataSource {
         do {
             let results =
             try managedContext.executeFetchRequest(fetchRequest)
-            people = results as! [NSManagedObject]
+            self.people = results as! [NSManagedObject]
         } catch let error as NSError {
             print("Could not fetch \(error), \(error.userInfo)")
         }
@@ -192,13 +228,15 @@ class ViewController: UIViewController,UITableViewDataSource {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
       
-        let path = tableView.indexPathForSelectedRow
-       
-        let player = people[(path?.row)!]
+        let cell = sender as! UITableViewCell
+        
+        let indexPath = tableView.indexPathForCell(cell)
+ 
+        let player = self.people[indexPath!.row]
         
         let desVc = segue.destinationViewController as? DestinationViewController
        
-        desVc?.people = player
+        desVc?.person = player
         
             
         

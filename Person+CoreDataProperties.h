@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, retain) NSString *name;
 @property (nullable, nonatomic, retain) NSString *picture;
+@property (nullable, nonatomic, retain) NSNumber *selected;
 @property (nullable, nonatomic, retain) NSString *skill;
 
 @end

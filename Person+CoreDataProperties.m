@@ -15,6 +15,7 @@
 
 @dynamic name;
 @dynamic picture;
+@dynamic selected;
 @dynamic skill;
 
 @end
